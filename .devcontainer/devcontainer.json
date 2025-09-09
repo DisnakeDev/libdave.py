@@ -1,0 +1,27 @@
+{
+    "name": "libdave.py",
+    // "image": "mcr.microsoft.com/devcontainers/python:1-3.12-bookworm"
+    "build": {
+        "dockerfile": "Dockerfile"
+    },
+
+    // "features": {},
+    // "forwardPorts": [],
+    // "postCreateCommand": "pip3 install --user -r requirements.txt",
+
+    "customizations": {
+        "vscode": {
+            "settings": {
+                "ruff.importStrategy": "fromEnvironment",
+                "editor.defaultFormatter": "charliermarsh.ruff"
+            },
+            "extensions": [
+                "ms-python.python",
+                "ms-python.vscode-pylance",
+                "charliermarsh.ruff",
+                "Gruntfuggly.todo-tree"
+            ]
+        }
+    },
+    "remoteUser": "root"
+}
