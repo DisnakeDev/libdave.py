@@ -1,0 +1,7 @@
+{
+    "cmake.sourceDirectory": "/workspaces/libdave.py/libdave/cpp",
+    "cmake.configureArgs": [
+        "-DCMAKE_TOOLCHAIN_FILE=${workspaceFolder}/libdave/cpp/vcpkg/scripts/buildsystems/vcpkg.cmake",
+        "-DVCPKG_MANIFEST_DIR=${workspaceFolder}/libdave/cpp/vcpkg-alts/boringssl",
+    ]
+}

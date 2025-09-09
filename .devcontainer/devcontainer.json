@@ -19,7 +19,8 @@
                 "ms-python.python",
                 "ms-python.vscode-pylance",
                 "charliermarsh.ruff",
-                "Gruntfuggly.todo-tree"
+                "Gruntfuggly.todo-tree",
+                "ms-vscode.cmake-tools"
             ]
         }
     },
