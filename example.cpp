@@ -1,3 +1,5 @@
+#include <iostream>
+
 #include <nanobind/nanobind.h>
 #include <nanobind/stl/function.h>
 // #include <nanobind/stl/shared_ptr.h>
@@ -9,9 +11,14 @@
 #include <dave/version.h>
 #include <dave/mls/session.h>
 
+#include "logging.h"
+
 namespace nb = nanobind;
 
 NB_MODULE(example, m) {
+    std::cout << "init" << std::endl;
+    init_logging();
+
     m.attr("kInitTransitionId") = discord::dave::kInitTransitionId;
     m.attr("kDisabledVersion") = discord::dave::kDisabledVersion;
 
