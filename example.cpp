@@ -73,6 +73,7 @@ NB_MODULE(example, m) {
     m.def("get_max_supported_protocol_version", discord::dave::MaxSupportedProtocolVersion);
 
     nb::class_<::mlspp::SignaturePrivateKey>(m, "SignaturePrivateKey");
+    nb::class_<discord::dave::MlsKeyRatchet>(m, "MlsKeyRatchet");
 
     nb::class_<SessionWrapper>(m, "Session")
         .def(nb::init<discord::dave::mls::KeyPairContextType, std::string, discord::dave::mls::Session::MLSFailureCallback>(),
