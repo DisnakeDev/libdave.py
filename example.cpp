@@ -22,7 +22,6 @@
 namespace nb = nanobind;
 
 NB_MODULE(example, m) {
-    std::cout << "init" << std::endl;
     init_logging();
 
     m.attr("kInitTransitionId") = discord::dave::kInitTransitionId;
