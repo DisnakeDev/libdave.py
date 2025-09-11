@@ -21,6 +21,10 @@ nanobind_add_stub(
     PYTHON_PATH $<TARGET_FILE_DIR:example>
     DEPENDS example
 )
+add_custom_command(
+    TARGET example_stub
+    POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_BINARY_DIR}/example.pyi ${CMAKE_CURRENT_SOURCE_DIR}/
+)
 
 add_subdirectory(${LIBDAVE_SRC_PATH})
 # find_package(libdave CONFIG REQUIRED)

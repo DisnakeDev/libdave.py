@@ -3,38 +3,39 @@ import enum
 
 
 kInitTransitionId: int = 0
-kDisabledVersion: int = 0
 
+kDisabledVersion: int = 0
 
 class MediaType(enum.IntEnum):
     audio = 0
-    video = 1
 
+    video = 1
 
 class Codec(enum.IntEnum):
     unknown = 0
+
     opus = 1
+
     vp8 = 2
+
     vp9 = 3
+
     h264 = 4
+
     h265 = 5
+
     av1 = 6
 
-
 def get_max_supported_protocol_version() -> int: ...
-
 
 class FailedT:
     pass
 
-
 class IgnoredT:
     pass
 
-
 class SignaturePrivateKey:
     pass
-
 
 class Session:
     def __init__(self, context: str, auth_session_id: str, callback: Callable[[str, str], None]) -> None: ...
