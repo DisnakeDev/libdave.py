@@ -144,25 +144,25 @@ NB_MODULE(example, m) {
     nb::class_<EncryptorWrapper>(m, "Encryptor")
         .def(nb::init<>())
         .def("set_key_ratchet",
-            &discord::dave::Encryptor::SetKeyRatchet, nb::arg("key_ratchet"))
+            &EncryptorWrapper::SetKeyRatchet, nb::arg("key_ratchet"))
         .def("set_passthrough_mode",
-            &discord::dave::Encryptor::SetPassthroughMode, nb::arg("passthrough_mode"))
+            &EncryptorWrapper::SetPassthroughMode, nb::arg("passthrough_mode"))
         .def("has_key_ratchet",
-            &discord::dave::Encryptor::HasKeyRatchet)
+            &EncryptorWrapper::HasKeyRatchet)
         .def("is_passthrough_mode",
-            &discord::dave::Encryptor::IsPassthroughMode)
+            &EncryptorWrapper::IsPassthroughMode)
         .def("assign_ssrc_to_codec",
-            &discord::dave::Encryptor::AssignSsrcToCodec, nb::arg("ssrc"), nb::arg("codec_type"))
+            &EncryptorWrapper::AssignSsrcToCodec, nb::arg("ssrc"), nb::arg("codec_type"))
         .def("codec_for_ssrc",
-            &discord::dave::Encryptor::CodecForSsrc, nb::arg("ssrc"))
+            &EncryptorWrapper::CodecForSsrc, nb::arg("ssrc"))
         .def("encrypt",
             &EncryptorWrapper::Encrypt, nb::arg("media_type"), nb::arg("ssrc"), nb::arg("frame"))
         .def("get_max_ciphertext_byte_size",
-            &discord::dave::Encryptor::GetMaxCiphertextByteSize, nb::arg("media_type"), nb::arg("frame_size"))
+            &EncryptorWrapper::GetMaxCiphertextByteSize, nb::arg("media_type"), nb::arg("frame_size"))
         .def("get_stats",
-            &discord::dave::Encryptor::GetStats, nb::arg("media_type"))
+            &EncryptorWrapper::GetStats, nb::arg("media_type"))
         .def("set_protocol_version_changed_callback",
-            &discord::dave::Encryptor::SetProtocolVersionChangedCallback, nb::arg("callback"))
+            &EncryptorWrapper::SetProtocolVersionChangedCallback, nb::arg("callback"))
         .def("get_protocol_version",
-            &discord::dave::Encryptor::GetProtocolVersion);
+            &EncryptorWrapper::GetProtocolVersion);
 }
