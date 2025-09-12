@@ -53,6 +53,10 @@ public:
     // inherit constructor
     using discord::dave::Encryptor::Encryptor;
 
+    void SetKeyRatchet(std::unique_ptr<discord::dave::MlsKeyRatchet> keyRatchet) {
+        return discord::dave::Encryptor::SetKeyRatchet(std::move(keyRatchet));
+    }
+
     std::optional<nb::bytes> Encrypt(
         discord::dave::MediaType mediaType,
         uint32_t ssrc,
