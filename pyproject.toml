@@ -2,6 +2,10 @@
 
 # thanks disnake
 
+[build-system]
+requires = ["scikit-build-core>=0.4.3", "nanobind==2.9.2"]
+build-backend = "scikit_build_core.build"
+
 [project]
 name = "libdave.py"
 description = "Python bindings for the libdave package."
@@ -13,18 +17,12 @@ requires-python = ">=3.8"
 license = { text = "MIT" }
 version = "0.1.0a"
 
-[build-system]
-requires = ["scikit-build-core >=0.4.3", "nanobind >=1.3.2"]
-build-backend = "scikit_build_core.build"
-
 [tool.scikit-build]
 minimum-version = "0.4"
-
 # Setuptools-style build caching in a local directory
 build-dir = "build/{wheel_tag}"
-
 # Build stable ABI wheels for CPython 3.12+
-wheel.py-api = "cp38"
+wheel.py-api = "cp312"
 
 [dependency-groups]
 nox = [
