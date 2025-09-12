@@ -14,8 +14,10 @@
 #include <mls/crypto.h>
 
 #include <dave/common.h>
+#include <dave/encryptor.h>
 #include <dave/version.h>
 #include <dave/mls/session.h>
+#include <dave/utils/array_view.h>
 
 #include "logging.h"
 
@@ -43,6 +45,42 @@ public:
 
     std::variant<RejectType, discord::dave::RosterMap> ProcessCommit(std::vector<uint8_t> commit) noexcept {
         return unwrapRejection(discord::dave::mls::Session::ProcessCommit(commit));
+    }
+};
+
+class EncryptorWrapper : public discord::dave::Encryptor {
+public:
+    // inherit constructor
+    using discord::dave::Encryptor::Encryptor;
+
+    std::optional<nb::bytes> Encrypt(
+        discord::dave::MediaType mediaType,
+        uint32_t ssrc,
+        nb::bytes frame
+    ) {
+        auto frameView = discord::dave::MakeArrayView(
+            reinterpret_cast<const uint8_t*>(frame.data()),
+            frame.size()
+        );
+
+        auto requiredSize = GetMaxCiphertextByteSize(mediaType, frameView.size());
+        std::vector<uint8_t> outFrame(requiredSize);
+        auto outFrameView = discord::dave::MakeArrayView(outFrame);
+
+        size_t bytesWritten = 0;
+        auto result = discord::dave::Encryptor::Encrypt(
+            mediaType,
+            ssrc,
+            frameView,
+            outFrameView,
+            &bytesWritten
+        );
+
+        if (result != 0) {
+            DISCORD_LOG(LS_ERROR) << "encryption failed: " << result;
+            return std::nullopt;
+        }
+        return nb::bytes(outFrame.data(), bytesWritten);
     }
 };
 
@@ -102,4 +140,29 @@ NB_MODULE(example, m) {
             &SessionWrapper::GetKeyRatchet, nb::arg("user_id"))
         .def("get_pairwise_fingerprint",
             &SessionWrapper::GetPairwiseFingerprint, nb::arg("version"), nb::arg("user_id"), nb::arg("callback"));
+
+    nb::class_<EncryptorWrapper>(m, "Encryptor")
+        .def(nb::init<>())
+        .def("set_key_ratchet",
+            &discord::dave::Encryptor::SetKeyRatchet, nb::arg("key_ratchet"))
+        .def("set_passthrough_mode",
+            &discord::dave::Encryptor::SetPassthroughMode, nb::arg("passthrough_mode"))
+        .def("has_key_ratchet",
+            &discord::dave::Encryptor::HasKeyRatchet)
+        .def("is_passthrough_mode",
+            &discord::dave::Encryptor::IsPassthroughMode)
+        .def("assign_ssrc_to_codec",
+            &discord::dave::Encryptor::AssignSsrcToCodec, nb::arg("ssrc"), nb::arg("codec_type"))
+        .def("codec_for_ssrc",
+            &discord::dave::Encryptor::CodecForSsrc, nb::arg("ssrc"))
+        .def("encrypt",
+            &EncryptorWrapper::Encrypt, nb::arg("media_type"), nb::arg("ssrc"), nb::arg("frame"))
+        .def("get_max_ciphertext_byte_size",
+            &discord::dave::Encryptor::GetMaxCiphertextByteSize, nb::arg("media_type"), nb::arg("frame_size"))
+        .def("get_stats",
+            &discord::dave::Encryptor::GetStats, nb::arg("media_type"))
+        .def("set_protocol_version_changed_callback",
+            &discord::dave::Encryptor::SetProtocolVersionChangedCallback, nb::arg("callback"))
+        .def("get_protocol_version",
+            &discord::dave::Encryptor::GetProtocolVersion);
 }
