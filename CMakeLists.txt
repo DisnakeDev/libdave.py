@@ -8,7 +8,7 @@ set(CMAKE_TOOLCHAIN_FILE ${LIBDAVE_SRC_PATH}/vcpkg/scripts/buildsystems/vcpkg.cm
 set(VCPKG_MANIFEST_DIR ${LIBDAVE_SRC_PATH}/vcpkg-alts/openssl_3 CACHE STRING "")
 
 
-project(libdave_py LANGUAGES CXX)
+project(dave LANGUAGES CXX)
 
 # Warn if the user invokes CMake directly
 if (NOT SKBUILD)
@@ -41,20 +41,20 @@ find_package(
 )
 add_subdirectory(nanobind)
 
-nanobind_add_module(_libdave_py_impl STABLE_ABI src/libdave_py.cpp)
+nanobind_add_module(_dave_impl STABLE_ABI src/dave.cpp)
 # TODO: fix
 # nanobind_add_stub(
-#     libdave_py_stub
-#     MODULE libdave_py
+#     dave_stub
+#     MODULE dave
 #     OUTPUT __init__.pyi
-#     PYTHON_PATH $<TARGET_FILE_DIR:_libdave_py_impl>
-#     DEPENDS _libdave_py_impl
+#     PYTHON_PATH $<TARGET_FILE_DIR:_dave_impl>
+#     DEPENDS _dave_impl
 # )
 # add_custom_command(
-#     TARGET libdave_py_stub
-#     POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_BINARY_DIR}/__init__.pyi ${CMAKE_CURRENT_SOURCE_DIR}/src/libdave_py/
+#     TARGET dave_stub
+#     POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_BINARY_DIR}/__init__.pyi ${CMAKE_CURRENT_SOURCE_DIR}/src/dave/
 # )
 
 add_subdirectory(${LIBDAVE_SRC_PATH})
-target_link_libraries(_libdave_py_impl PRIVATE libdave)
-install(TARGETS _libdave_py_impl LIBRARY DESTINATION libdave_py)
+target_link_libraries(_dave_impl PRIVATE libdave)
+install(TARGETS _dave_impl LIBRARY DESTINATION dave)

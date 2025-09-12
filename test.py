@@ -1,6 +1,6 @@
 import logging
 
-import libdave_py as dave
+import dave
 
 logging.basicConfig(
     level=logging.DEBUG,

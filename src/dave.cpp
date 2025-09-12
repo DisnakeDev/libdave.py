@@ -84,7 +84,7 @@ public:
     }
 };
 
-NB_MODULE(_libdave_py_impl, m) {
+NB_MODULE(_dave_impl, m) {
     init_logging();
 
     m.attr("kInitTransitionId") = discord::dave::kInitTransitionId;

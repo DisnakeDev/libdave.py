@@ -23,6 +23,7 @@ minimum-version = "0.4"
 build-dir = "build/{wheel_tag}"
 # Build stable ABI wheels for CPython 3.12+
 wheel.py-api = "cp312"
+wheel.packages = ["src/dave"]
 
 [dependency-groups]
 nox = [
@@ -45,10 +46,6 @@ build = [
     "build~=0.10.0",
     "twine~=5.1.1",
 ]
-
-[tool.setuptools.packages.find]
-where = ["."]
-include = ["libdave.py*"]
 
 [tool.nox]
 script-venv-backend = "uv|virtualenv"
@@ -198,6 +195,6 @@ ignore-fully-untyped = true
 [tool.pyright]
 typeCheckingMode = "strict"
 include = [
-    "libdave.py",
+    "dave",
     "*.py",
 ]
