@@ -21,7 +21,8 @@
                 "charliermarsh.ruff",
                 "Gruntfuggly.todo-tree",
                 "ms-vscode.cmake-tools",
-                "tamasfe.even-better-toml"
+                "tamasfe.even-better-toml",
+                "ms-vscode.cpptools"
             ]
         }
     },

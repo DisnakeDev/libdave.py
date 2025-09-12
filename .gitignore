@@ -217,4 +217,6 @@ __marimo__/
 
 
 build*/
-.vscode/
+
+.vscode/*
+!.vscode/c_cpp_properties.json
