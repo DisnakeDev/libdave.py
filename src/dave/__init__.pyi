@@ -33,6 +33,8 @@ class Codec(enum.IntEnum):
 
 def get_max_supported_protocol_version() -> int: ...
 
+def test_get_random_ratchet() -> MlsKeyRatchet: ...
+
 class SignaturePrivateKey:
     pass
 
