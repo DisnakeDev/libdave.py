@@ -171,8 +171,8 @@ NB_MODULE(_dave_impl, m) {
             &EncryptorWrapper::Encrypt, nb::arg("media_type"), nb::arg("ssrc"), nb::arg("frame"))
         .def("get_max_ciphertext_byte_size",
             &EncryptorWrapper::GetMaxCiphertextByteSize, nb::arg("media_type"), nb::arg("frame_size"))
-        .def("get_stats",
-            &EncryptorWrapper::GetStats, nb::arg("media_type"))
+        // .def("get_stats",
+        //     &EncryptorWrapper::GetStats, nb::arg("media_type"))
         .def("set_protocol_version_changed_callback",
             &EncryptorWrapper::SetProtocolVersionChangedCallback, nb::arg("callback"))
         .def("get_protocol_version",
