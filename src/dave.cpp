@@ -127,9 +127,9 @@ NB_MODULE(_dave_impl, m) {
 
     nb::class_<SessionWrapper>(m, "Session")
         .def(nb::init<discord::dave::mls::KeyPairContextType, std::string, discord::dave::mls::Session::MLSFailureCallback>(),
-            nb::arg("context"), nb::arg("auth_session_id"), nb::arg("callback"))
+            nb::arg("context"), nb::arg("auth_session_id"), nb::arg("mls_failure_callback"))
         .def("init",
-            &SessionWrapper::Init, nb::arg("version"), nb::arg("group_id"), nb::arg("self_user_id"), nb::arg("transient_key"))
+            &SessionWrapper::Init, nb::arg("version"), nb::arg("group_id"), nb::arg("self_user_id"), nb::arg("transient_key").none())
         .def("reset",
             &SessionWrapper::Reset)
         .def("set_protocol_version",
@@ -149,14 +149,16 @@ NB_MODULE(_dave_impl, m) {
         .def("get_marshalled_key_package",
             &SessionWrapper::GetMarshalledKeyPackage)
         .def("get_key_ratchet",
-            &SessionWrapper::GetKeyRatchet, nb::arg("user_id"))
+            &SessionWrapper::GetKeyRatchet, nb::arg("user_id"),
+            // explicit signature as this can return a nullptr
+            nb::sig("def get_key_ratchet(self, user_id: str) -> MlsKeyRatchet | None"))
         .def("get_pairwise_fingerprint",
             &SessionWrapper::GetPairwiseFingerprint, nb::arg("version"), nb::arg("user_id"), nb::arg("callback"));
 
     nb::class_<EncryptorWrapper>(m, "Encryptor")
         .def(nb::init<>())
         .def("set_key_ratchet",
-            &EncryptorWrapper::SetKeyRatchet, nb::arg("key_ratchet"))
+            &EncryptorWrapper::SetKeyRatchet, nb::arg("key_ratchet").none())
         .def("set_passthrough_mode",
             &EncryptorWrapper::SetPassthroughMode, nb::arg("passthrough_mode"))
         .def("has_key_ratchet",
