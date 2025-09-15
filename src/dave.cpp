@@ -114,14 +114,6 @@ NB_MODULE(_dave_impl, m) {
 
     m.def("get_max_supported_protocol_version", discord::dave::MaxSupportedProtocolVersion);
 
-    // temporary
-    m.def("test_get_random_ratchet", []() {
-        return std::make_unique<discord::dave::MlsKeyRatchet>(
-            mlspp::CipherSuite(mlspp::CipherSuite::ID::X25519_AES128GCM_SHA256_Ed25519),
-            mlspp::random_bytes(16)
-        );
-    });
-
     nb::class_<::mlspp::SignaturePrivateKey>(m, "SignaturePrivateKey");
     nb::class_<discord::dave::MlsKeyRatchet>(m, "MlsKeyRatchet");
 
