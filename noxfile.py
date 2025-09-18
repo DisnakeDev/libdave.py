@@ -12,8 +12,7 @@
 
 from __future__ import annotations
 
-import pathlib
-from typing import Any, Dict, List, Sequence, Tuple
+from typing import Any, Dict, List, Sequence
 
 import nox
 
@@ -45,7 +44,8 @@ def install_deps(
 ) -> None:
     """Helper to install dependencies from a group."""
     if not project and extras:
-        raise TypeError("Cannot install extras without also installing the project")
+        msg = "Cannot install extras without also installing the project"
+        raise TypeError(msg)
 
     command: List[str] = [
         "pdm",

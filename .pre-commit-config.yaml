@@ -2,8 +2,6 @@
 
 ## Pre-commit setup
 
-# thanks disnake
-
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v5.0.0
@@ -31,8 +29,8 @@ repos:
         types: [symlink]
 
   - repo: https://github.com/charliermarsh/ruff-pre-commit
-    rev: v0.12.12
+    rev: v0.13.0
     hooks:
       - id: ruff-format
       - id: ruff-check
-        args: [--fix, --fixable=I]
+        args: ['--fix']
