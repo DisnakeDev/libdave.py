@@ -8,8 +8,6 @@
 
 # SPDX-License-Identifier: MIT
 
-# thanks disnake
-
 from __future__ import annotations
 
 from typing import Any, Dict, List, Sequence
@@ -18,21 +16,11 @@ import nox
 
 nox.needs_version = ">=2025.5.1"
 
-
 nox.options.error_on_external_run = True
+nox.options.default_venv_backend = "uv|virtualenv"
 nox.options.reuse_venv = "yes"
-nox.options.sessions = [
-    "lint",
-    "check-manifest",
-    "slotscheck",
-    "pyright",
-    "test",
-]
 
 PYPROJECT = nox.project.load_toml()
-
-# used to reset cached coverage data once for the first test run only
-reset_coverage = True
 
 
 def install_deps(
@@ -81,13 +69,6 @@ def lint(session: nox.Session) -> None:
     install_deps(session, project=False, groups=["tools"])
 
     session.run("pre-commit", "run", "--all-files", *session.posargs)
-
-
-@nox.session(name="check-manifest")
-def check_manifest(session: nox.Session) -> None:
-    """Run check-manifest."""
-    install_deps(session, project=False, groups=["tools"])
-    session.run("check-manifest", "-v")
 
 
 @nox.session
