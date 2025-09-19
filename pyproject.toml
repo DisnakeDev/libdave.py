@@ -15,6 +15,11 @@ dev = [
   { include-group = "tools" },
   { include-group = "typing" },
 ]
+docs = [
+    "sphinx>=8.2.3",
+    "sphinx-autobuild>=2025.8.25",
+    "sphinx-book-theme>=1.1.4",
+]
 nox = [
   "nox==2025.5.1",
 ]
@@ -111,16 +116,18 @@ minimum-version = "build-system.requires"
 # Setuptools-style build caching in a local directory
 build-dir = "build/{wheel_tag}"
 # Build stable ABI wheels for CPython 3.12+
-wheel.py-api = "cp312"
+wheel.py-api = "cp310"
 wheel.packages = ["src/dave"]
 cmake.build-type = "Debug"
 
 [tool.uv]
 cache-keys = [
-  { file = "pyproject.toml" },
   { file = "src/**/*.{h,c,hpp,cpp}" },
   { file = "CMakeLists.txt" },
 ]
+
+[tool.uv.dependency-groups]
+docs = { requires-python = ">3.11" }
 
 [tool.uv.config-settings]
 "editable.rebuild" = "true"
