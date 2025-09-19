@@ -1,19 +1,22 @@
 import enum
-from typing import Callable, Sequence
+from collections.abc import Callable, Sequence, Set as AbstractSet
 
-kInitTransitionId: int = 0  # noqa: N816
+kInitTransitionId: int = 0
 
-kDisabledVersion: int = 0  # noqa: N816
+kDisabledVersion: int = 0
+
 
 class RejectType(enum.IntEnum):
     failed = 0
 
     ignored = 1
 
+
 class MediaType(enum.IntEnum):
     audio = 0
 
     video = 1
+
 
 class Codec(enum.IntEnum):
     unknown = 0
@@ -30,18 +33,23 @@ class Codec(enum.IntEnum):
 
     av1 = 6
 
+
 def get_max_supported_protocol_version() -> int: ...
 
-class SignaturePrivateKey: ...
-class MlsKeyRatchet: ...
+
+class SignaturePrivateKey:
+    ...
+
+
+class MlsKeyRatchet:
+    ...
+
 
 class Session:
     def __init__(
-        self,
-        context: str,
-        auth_session_id: str,
-        mls_failure_callback: Callable[[str, str], None],
+        self, context: str, auth_session_id: str, mls_failure_callback: Callable[[str, str], None],
     ) -> None: ...
+
     def init(
         self,
         version: int,
@@ -54,18 +62,24 @@ class Session:
     def get_protocol_version(self) -> int: ...
     def get_last_epoch_authenticator(self) -> list[int]: ...
     def set_external_sender(self, external_sender_package: bytes) -> None: ...
+
     def process_proposals(
-        self, proposals: bytes, recognized_user_ids: set[str]
+        self, proposals: bytes, recognized_user_ids: AbstractSet[str]
     ) -> bytes | None: ...
-    def process_commit(self, commit: bytes) -> RejectType | dict[int, list[int]]: ...
+
+    def process_commit(
+        self, commit: bytes) -> RejectType | dict[int, list[int]]: ...
+
     def process_welcome(
-        self, welcome: bytes, recognized_user_ids: set[str]
+        self, welcome: bytes, recognized_user_ids: AbstractSet[str]
     ) -> dict[int, list[int]] | None: ...
     def get_marshalled_key_package(self) -> bytes: ...
     def get_key_ratchet(self, user_id: str) -> MlsKeyRatchet | None: ...
+
     def get_pairwise_fingerprint(
         self, version: int, user_id: str, callback: Callable[[Sequence[int]], None]
     ) -> None: ...
+
 
 class Encryptor:
     def __init__(self) -> None: ...
@@ -75,7 +89,13 @@ class Encryptor:
     def is_passthrough_mode(self) -> bool: ...
     def assign_ssrc_to_codec(self, ssrc: int, codec_type: Codec) -> None: ...
     def codec_for_ssrc(self, ssrc: int) -> Codec: ...
-    def encrypt(self, media_type: MediaType, ssrc: int, frame: bytes) -> bytes | None: ...
-    def get_max_ciphertext_byte_size(self, media_type: MediaType, frame_size: int) -> int: ...
-    def set_protocol_version_changed_callback(self, callback: Callable[[], None]) -> None: ...
+
+    def encrypt(self, media_type: MediaType, ssrc: int,
+                frame: bytes) -> bytes | None: ...
+
+    def get_max_ciphertext_byte_size(
+        self, media_type: MediaType, frame_size: int) -> int: ...
+    def set_protocol_version_changed_callback(
+        self, callback: Callable[[], None]) -> None: ...
+
     def get_protocol_version(self) -> int: ...
