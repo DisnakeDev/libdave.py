@@ -40,13 +40,15 @@ jobs:
       with:
         submodules: true
 
-    - run: |
+    - name: Run bootstrap
+      run: |
         cd ./libdave
         if [ "${{ runner.os }}" = "Windows" ]; then
             libdave/cpp/vcpkg/scripts/bootstrap.ps1
           else
             ./libdave/cpp/vcpkg/scripts/bootstrap.sh
           fi
+      shell: bash
 
     - uses: pypa/cibuildwheel@v2.22
 
