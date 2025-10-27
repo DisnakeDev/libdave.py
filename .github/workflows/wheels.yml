@@ -40,6 +40,13 @@ jobs:
       with:
         submodules: true
 
+    - run: |
+        if [ "${{ runner.os }}" = "Windows" ]; then
+            libdave/cpp/vcpkg/scripts/bootstrap.ps1
+          else
+            ./libdave/cpp/vcpkg/scripts/bootstrap.sh
+          fi
+
     - uses: pypa/cibuildwheel@v2.22
 
     - name: Verify clean directory
