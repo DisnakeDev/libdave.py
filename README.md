@@ -55,3 +55,10 @@ To make development even more seamless, you can optionally have the extension be
 ```sh
 pip install --no-build-isolation -Ceditable.rebuild=true -ve .
 ```
+
+
+### Creating a wheel
+To create a built wheel relatively easily, e.g. for testing in another project:
+```sh
+pip wheel .
+```
