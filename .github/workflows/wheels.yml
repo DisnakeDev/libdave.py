@@ -41,6 +41,7 @@ jobs:
         submodules: true
 
     - run: |
+        cd ./libdave
         if [ "${{ runner.os }}" = "Windows" ]; then
             libdave/cpp/vcpkg/scripts/bootstrap.ps1
           else
