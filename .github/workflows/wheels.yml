@@ -43,7 +43,6 @@ jobs:
     - name: Run bootstrap
       working-directory: ./libdave
       run: |
-        cd ./libdave
         if [ "${{ runner.os }}" = "Windows" ]; then
             libdave/cpp/vcpkg/scripts/bootstrap.ps1
           else
