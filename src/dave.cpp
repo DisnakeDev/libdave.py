@@ -78,6 +78,10 @@ public:
     nb::bytes GetMarshalledKeyPackage() {
         return nb::vector_to_bytes(discord::dave::mls::Session::GetMarshalledKeyPackage());
     }
+
+    nb::bytes GetLastEpochAuthenticator() {
+        return nb::vector_to_bytes(discord::dave::mls::Session::GetLastEpochAuthenticator());
+    }
 };
 
 class EncryptorWrapper : public discord::dave::Encryptor {
