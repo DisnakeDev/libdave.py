@@ -107,6 +107,11 @@ before-all = "dnf install -y git curl zip unzip pkgconfig perl-IPC-Cmd"
 [tool.cibuildwheel.macos]
 before-all = "brew install zip unzip curl pkgconfig"
 
+[[tool.cibuildwheel.overrides]]
+# manylinux uses dnf/yum (because almalinux), musllinux (obviously) does not
+select = ["*-musllinux_*"]
+before-all = "apk add git curl zip unzip pkgconfig"
+
 # Needed for full C++17 support on macOS
 [tool.cibuildwheel.macos.environment]
 MACOSX_DEPLOYMENT_TARGET = "10.14"
