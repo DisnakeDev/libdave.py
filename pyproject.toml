@@ -110,7 +110,11 @@ before-all = "brew install zip unzip curl pkgconfig"
 [[tool.cibuildwheel.overrides]]
 # manylinux uses dnf/yum (because almalinux), musllinux (obviously) does not
 select = ["*-musllinux_*"]
-before-all = "apk add git curl zip unzip pkgconfig"
+before-all = [
+  "apk add git curl zip unzip pkgconfig",
+  # redownload vcpkg binary for musllinux
+  "./libdave/cpp/vcpkg/bootstrap-vcpkg.sh",
+]
 
 # Needed for full C++17 support on macOS
 [tool.cibuildwheel.macos.environment]
