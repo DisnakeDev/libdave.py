@@ -44,6 +44,10 @@ jobs:
         with:
           submodules: recursive
 
+      # TODO: this is somewhat expensive. maybe we can drop the vcpkg submodule somehow?
+      - name: Unshallow vcpkg submodule
+        run: git -C libdave/cpp/vcpkg fetch --unshallow
+
       - name: Run bootstrap
         working-directory: ./libdave
         run: |
