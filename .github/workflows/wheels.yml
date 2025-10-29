@@ -48,10 +48,10 @@ jobs:
         working-directory: ./libdave
         run: |
           if [ "${{ runner.os }}" = "Windows" ]; then
-              cpp/vcpkg/bootstrap-vcpkg.bat
-            else
-              ./cpp/vcpkg/bootstrap-vcpkg.sh
-            fi
+            cpp/vcpkg/bootstrap-vcpkg.bat
+          else
+            ./cpp/vcpkg/bootstrap-vcpkg.sh
+          fi
         shell: bash
 
       - uses: pypa/cibuildwheel@v3.2
