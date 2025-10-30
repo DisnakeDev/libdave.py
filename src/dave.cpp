@@ -174,6 +174,15 @@ NB_MODULE(_dave_impl, m) {
     nb::class_<::mlspp::SignaturePrivateKey>(m, "SignaturePrivateKey");
     nb::class_<discord::dave::MlsKeyRatchet>(m, "MlsKeyRatchet");
 
+    nb::class_<discord::dave::EncryptorStats>(m, "EncryptorStats")
+        .def_ro("passthrough_count", &discord::dave::EncryptorStats::passthroughCount)
+        .def_ro("encrypt_success_count", &discord::dave::EncryptorStats::encryptSuccessCount)
+        .def_ro("encrypt_failure_count", &discord::dave::EncryptorStats::encryptFailureCount)
+        .def_ro("encrypt_duration", &discord::dave::EncryptorStats::encryptDuration)
+        .def_ro("encrypt_attempts", &discord::dave::EncryptorStats::encryptAttempts)
+        .def_ro("encrypt_max_attempts", &discord::dave::EncryptorStats::encryptMaxAttempts)
+        .def_ro("encrypt_missing_key_count", &discord::dave::EncryptorStats::encryptMissingKeyCount);
+
     nb::class_<SessionWrapper>(m, "Session")
         .def(nb::init<discord::dave::mls::KeyPairContextType, std::string, discord::dave::mls::Session::MLSFailureCallback>(),
             nb::arg("context"), nb::arg("auth_session_id"), nb::arg("mls_failure_callback"))
@@ -223,8 +232,8 @@ NB_MODULE(_dave_impl, m) {
             &EncryptorWrapper::Encrypt, nb::arg("media_type"), nb::arg("ssrc"), nb::arg("frame"))
         .def("get_max_ciphertext_byte_size",
             &EncryptorWrapper::GetMaxCiphertextByteSize, nb::arg("media_type"), nb::arg("frame_size"))
-        // .def("get_stats",
-        //     &EncryptorWrapper::GetStats, nb::arg("media_type"))
+        .def("get_stats",
+            &EncryptorWrapper::GetStats, nb::arg("media_type"))
         .def("set_protocol_version_changed_callback",
             &EncryptorWrapper::SetProtocolVersionChangedCallback, nb::arg("callback"))
         .def("get_protocol_version",
