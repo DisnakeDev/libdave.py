@@ -28,7 +28,7 @@ typing = [
 ]
 
 [build-system]
-requires = ["nanobind>=2.9.2", "scikit-build-core>=0.4.3"]
+requires = ["nanobind>=2.9.2", "scikit-build-core>=0.11.0"]
 build-backend = "scikit_build_core.build"
 
 [tool.poe.tasks]
