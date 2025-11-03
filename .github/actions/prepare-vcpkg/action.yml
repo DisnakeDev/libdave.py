@@ -27,7 +27,7 @@ runs:
         if [ "${{ runner.os }}" = "Linux" ]; then
           CACHE_DIR="/host${CACHE_DIR}"
         fi
-        echo "VCPKG_BINARY_SOURCES=files,$CACHE_DIR,readwrite" >> "$GITHUB_ENV"
+        echo "VCPKG_BINARY_SOURCES=clear;files,$CACHE_DIR,readwrite" >> "$GITHUB_ENV"
 
     - name: Capture vcpkg revision for use in cache key
       shell: bash
