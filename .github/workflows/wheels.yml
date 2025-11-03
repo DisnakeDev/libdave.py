@@ -38,6 +38,9 @@ jobs:
           # - macos-15-intel
           # - macos-latest
           - windows-latest
+        # this will be the only one for now, but left configurable nonetheless
+        # TODO: actually use this for VCPKG_MANIFEST_DIR
+        crypto: [boringssl]
 
     steps:
       - uses: actions/checkout@v5
@@ -48,16 +51,14 @@ jobs:
       - name: Unshallow vcpkg submodule
         run: git -C libdave/cpp/vcpkg fetch --unshallow
 
-      - name: Run bootstrap
-        working-directory: ./libdave
-        run: |
-          if [ "${{ runner.os }}" = "Windows" ]; then
-            cpp/vcpkg/bootstrap-vcpkg.bat
-          else
-            ./cpp/vcpkg/bootstrap-vcpkg.sh
-          fi
-        shell: bash
+      - uses: ./.github/actions/prepare-vcpkg
+        with:
+          os: ${{ matrix.os }}
+          crypto: ${{ matrix.crypto }}
+          cache-dir: ${{ github.workspace }}/vcpkg_cache
 
+      # TODO: CMAKE_BUILD_PARALLEL_LEVEL ?
+      # TODO: REQUIRE_BORINGSSL to enforce boringssl if requested?
       - uses: pypa/cibuildwheel@v3.2
 
       - name: Verify clean directory
