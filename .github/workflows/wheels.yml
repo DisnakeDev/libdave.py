@@ -40,7 +40,7 @@ jobs:
           - windows-latest
         # this will be the only one for now, but left configurable nonetheless
         # TODO: actually use this for VCPKG_MANIFEST_DIR
-        crypto: [boringssl]
+        crypto: [openssl_3]
 
     steps:
       - uses: actions/checkout@v5
