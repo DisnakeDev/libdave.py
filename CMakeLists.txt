@@ -7,6 +7,16 @@ set(LIBDAVE_SRC_PATH ${CMAKE_CURRENT_SOURCE_DIR}/libdave/cpp)
 set(CMAKE_TOOLCHAIN_FILE ${LIBDAVE_SRC_PATH}/vcpkg/scripts/buildsystems/vcpkg.cmake CACHE STRING "")
 set(VCPKG_MANIFEST_DIR ${LIBDAVE_SRC_PATH}/vcpkg-alts/boringssl CACHE STRING "")
 
+if (WIN32)
+    if (CMAKE_GENERATOR_PLATFORM STREQUAL "x64")
+        set(VCPKG_TARGET_TRIPLET "x64-windows-static-md")
+    elseif (CMAKE_GENERATOR_PLATFORM STREQUAL "ARM64")
+        set(VCPKG_TARGET_TRIPLET "arm64-windows-static-md")
+    else()
+        message(FATAL_ERROR "unexpected platform: ${CMAKE_GENERATOR_PLATFORM}")
+    endif()
+endif()
+
 
 project(dave LANGUAGES CXX)
 
