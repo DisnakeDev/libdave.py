@@ -42,6 +42,7 @@ include = [
   "*.py",
 ]
 
+
 [tool.ruff]
 line-length = 100
 extend-exclude = [
@@ -76,15 +77,6 @@ combine-as-imports = true
 [tool.ruff.lint.pyupgrade]
 keep-runtime-typing = true
 
-[tool.scikit-build]
-minimum-version = "build-system.requires"
-# Setuptools-style build caching in a local directory
-build-dir = "build/{wheel_tag}"
-# Build stable ABI wheels for CPython 3.12+
-wheel.py-api = "cp312"
-wheel.packages = ["src/dave"]
-cmake.build-type = "Release"
-cmake.define = { BUILD_SHARED_LIBS = "OFF" }
 
 [tool.uv]
 cache-keys = [
@@ -95,6 +87,18 @@ cache-keys = [
 
 [tool.uv.config-settings]
 "editable.rebuild" = "true"
+
+
+[tool.scikit-build]
+minimum-version = "build-system.requires"
+# Setuptools-style build caching in a local directory
+build-dir = "build/{wheel_tag}"
+# Build stable ABI wheels for CPython 3.12+
+wheel.py-api = "cp312"
+wheel.packages = ["src/dave"]
+cmake.build-type = "Release"
+cmake.define = { BUILD_SHARED_LIBS = "OFF" }
+
 
 [tool.cibuildwheel]
 build = [
