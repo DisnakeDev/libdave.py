@@ -38,6 +38,7 @@ jobs:
           # - macos-15-intel
           # - macos-latest
           - windows-latest
+          # - windows-11-arm
         # this will be the only one for now, but left configurable nonetheless
         # TODO: actually use this for VCPKG_MANIFEST_DIR
         crypto: [openssl_3]

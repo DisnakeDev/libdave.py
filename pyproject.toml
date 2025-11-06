@@ -111,10 +111,6 @@ build = [
 build-verbosity = 1
 environment-pass = ["VCPKG_BINARY_SOURCES", "CI"]
 
-[tool.cibuildwheel.windows]
-# cross-compile arm64 on x86_64 runners
-archs = ["all"]
-
 # - see https://learn.microsoft.com/en-us/vcpkg/concepts/supported-hosts#dependencies
 # - perl-IPC-Cmd is needed to build openssl
 [tool.cibuildwheel.linux]
