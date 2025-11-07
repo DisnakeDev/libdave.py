@@ -96,9 +96,20 @@ jobs:
           crypto: ${{ matrix.crypto }}
           cache-dir: ${{ github.workspace }}/vcpkg_cache
 
+      - name: Set up QEMU
+        # armv7l can run natively on arm64v8, no qemu needed
+        if: runner.os == 'Linux' && matrix.arch != 'native' && matrix.arch != 'armv7l'
+        uses: docker/setup-qemu-action@v3
+        with:
+          platforms: all
+
       # TODO: CMAKE_BUILD_PARALLEL_LEVEL ?
       # TODO: REQUIRE_BORINGSSL to enforce boringssl if requested?
       - uses: pypa/cibuildwheel@v3.2
+        env:
+          # choose manylinux/musllinux (they are split for the sake of ci speedup)
+          CIBW_SKIP: ${{ matrix.libc == 'glibc' && '*musllinux*' || '*manylinux*'}}
+          CIBW_ARCHS: ${{ matrix.arch }}
 
       - name: Verify clean directory
         run: git diff --exit-code
