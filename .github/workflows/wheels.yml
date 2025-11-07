@@ -26,23 +26,60 @@ jobs:
           name: dist-sdist
           path: dist/*.tar.gz
 
+  generate_matrix:
+    name: Generate OS matrix
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.script.outputs.matrix }}
+    steps:
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - name: Run python matrix script
+        id: script
+        run: |
+          echo "matrix=$(python - <<EOF
+          # XXX: final setup, to be enabled later (once everything actually works)
+          # single = ["macos-15-intel", "macos-latest", "windows-latest", "windows-11-arm"]
+          # ubuntu_archs = {
+          #     "ubuntu-latest": ["native", "ppc64le", "s390x", "riscv64"],
+          #     "ubuntu-24.04-arm": ["native", "armv7l"],
+          # }
+          single = ["windows-latest"]
+          ubuntu_archs = {"ubuntu-latest": ["native"]}
+          # this will be the only one for now, but left configurable nonetheless
+          # TODO: actually use this for VCPKG_MANIFEST_DIR
+          crypto = ["openssl_3"]
+
+          matrix = []
+
+          # simple os, nothing fancy
+          for os in single:
+              matrix += [{"os": os}]
+
+          # linux runs on multiple archs and with/without musl
+          for os, archs in ubuntu_archs.items():
+              for arch in archs:
+                  for libc in ["glibc", "musl"]:
+                      matrix += [{"os": os, "arch": arch, "libc": libc}]
+
+          # mix in crypto libraries into every entry
+          matrix = [{**m, "crypto": c} for m in matrix for c in crypto]
+
+          import json
+          print(json.dumps(matrix))
+          EOF
+          )" >> $GITHUB_OUTPUT
 
   build_wheels:
-    name: Wheels on ${{ matrix.os }}
+    name: Wheels (${{ matrix.os }}, ${{ matrix.arch }}, ${{ matrix.libc }})
     runs-on: ${{ matrix.os }}
+    needs: generate_matrix
     strategy:
       fail-fast: false
       matrix:
-        os:
-          - ubuntu-latest
-          # - ubuntu-24.04-arm
-          # - macos-15-intel
-          # - macos-latest
-          - windows-latest
-          # - windows-11-arm
-        # this will be the only one for now, but left configurable nonetheless
-        # TODO: actually use this for VCPKG_MANIFEST_DIR
-        crypto: [openssl_3]
+        # entries are {os: *, arch: *, libc: *, crypto: *}
+        include: ${{ fromJSON(needs.generate_matrix.outputs.matrix) }}
 
     steps:
       - uses: actions/checkout@v5
