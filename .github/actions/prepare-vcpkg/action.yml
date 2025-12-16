@@ -54,6 +54,24 @@ runs:
         fi
         # linux will bootstrap later, since it runs in a separate container instead of directly on the host
 
+    - name: Restore cached vcpkg-tool binary
+      if: runner.os == 'Linux'
+      uses: actions/cache@v4
+      with:
+        path: libdave/cpp/vcpkg/vcpkg
+        key: vcpkg-tool--${{ inputs.os-arch-key }}--${{ steps.vcpkg-ref.outputs.ref }}
+        # no restore keys, so that we rebuild when the submodule was updated
+
+    # This ensures the (potentially locally built) vcpkg binary gets copied to
+    # the path expected by the previous cache step.
+    # Note that we use `/host` again, since this will be used from inside the container.
+    - name: Set $COPY_VCPKG_BINARY_PATH
+      if: runner.os == 'Linux'
+      shell: bash
+      run: |
+        VCPKG_PATH="$PWD/libdave/cpp/vcpkg/vcpkg"
+        echo "COPY_VCPKG_BINARY_PATH=/host${VCPKG_PATH}" >> $GITHUB_ENV
+
     # NOTE: we don't currently build with boringssl, so this is no longer needed but retained here for future reference.
     # # Some versions of clang++ on macOS appear to always insert /usr/local/include at the start of the include paths,
     # # notably disregarding -isystem. This breaks building with boringssl, since the includes end up conflicting.
