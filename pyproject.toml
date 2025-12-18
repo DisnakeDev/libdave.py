@@ -115,28 +115,40 @@ environment-pass = ["CI", "VCPKG_BINARY_SOURCES", "COPY_VCPKG_BINARY_PATH"]
 before-all = "brew install zip unzip curl pkgconfig nasm go"
 
 [tool.cibuildwheel.linux]
-before-all = [
-  # set up vcpkg
-  "./scripts/setup-vcpkg.sh",
-  # dependencies will be installed in the overrides below, since manylinux uses dnf/yum (because almalinux), and musllinux (obviously) does not
-]
+# all of this is configured step by step through the overrides below due to package manager differences.
+# manylinux is RHEL-based (i.e. dnf/yum), except armv7l which is Debian-based (i.e. apt-get), musllinux obviously uses apk
+before-all = []
+
 
 # - see https://learn.microsoft.com/en-us/vcpkg/concepts/supported-hosts#dependencies
-# - perl-IPC-Cmd + perl-FindBin are needed to build openssl
+# - perl-IPC-Cmd + perl-FindBin are needed to build openssl in RHEL
 [[tool.cibuildwheel.overrides]]
 select = ["*-manylinux_*"]
-inherit.before-all = "prepend"
 before-all = ["dnf install -y git curl zip unzip pkgconfig nasm golang perl-IPC-Cmd perl-FindBin ninja-build"]
 
 [[tool.cibuildwheel.overrides]]
+select = ["*-manylinux_armv7l"]
+before-all = [
+  "apt-get update",
+  "apt-get install -y git curl zip unzip pkg-config nasm golang ninja-build"
+]
+
+[[tool.cibuildwheel.overrides]]
 select = ["*-musllinux_*"]
-inherit.before-all = "prepend"
 before-all = ["apk add git curl zip unzip pkgconfig nasm go ninja-build ninja-is-really-ninja"]
+
+
+# this runs last, for all linux builds
+[[tool.cibuildwheel.overrides]]
+select = ["*-????linux_*"]
+inherit.before-all = "append"
+before-all = ["./scripts/setup-vcpkg.sh"]
 
 # required to build vcpkg on other platforms
 [[tool.cibuildwheel.overrides]]
 select = "*linux_{aarch64,armv7l,ppc64le,s390x,riscv64}"
 environment = { VCPKG_FORCE_SYSTEM_BINARIES = "1" }
+
 
 # Needed for full C++17 support on macOS
 [tool.cibuildwheel.macos.environment]
