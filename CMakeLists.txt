@@ -17,6 +17,13 @@ if (WIN32)
     endif()
 endif()
 
+cmake_host_system_information(RESULT PLATFORM QUERY OS_PLATFORM)
+if (PLATFORM STREQUAL "armv8l")
+    # vcpkg doesn't seem to understand armv8l (i.e. aarch64 running in 32-bit mode),
+    # it only knows aarch64 and armv7l, so we must explicitly tell it what we're building
+    set(VCPKG_TARGET_TRIPLET "arm-linux")
+endif()
+
 
 project(dave LANGUAGES CXX)
 
