@@ -106,13 +106,8 @@ public:
         return nb::vector_to_bytes(_session->GetLastEpochAuthenticator());
     }
 
-    std::unique_ptr<dave::MlsKeyRatchet> GetKeyRatchet(std::string const& userId) const noexcept {
-        auto ratchet = _session->GetKeyRatchet(userId);
-        // XXX: since we expose MlsKeyRatchet as an opaque type anyway, could we actually just return the opaque IKeyRatchet?
-        // required to cast unique_ptr<IKeyRatchet> to unique_ptr<MlsKeyRatchet>
-        return std::unique_ptr<dave::MlsKeyRatchet>(
-            static_cast<dave::MlsKeyRatchet*>(ratchet.release())
-        );
+    std::unique_ptr<dave::IKeyRatchet> GetKeyRatchet(std::string const& userId) const noexcept {
+        return _session->GetKeyRatchet(userId);
     }
 
     nb::object GetPairwiseFingerprint(
@@ -143,7 +138,7 @@ public:
         _encryptor = std::make_unique<dave::Encryptor>();
     }
 
-    void SetKeyRatchet(std::unique_ptr<dave::MlsKeyRatchet> keyRatchet) {
+    void SetKeyRatchet(std::unique_ptr<dave::IKeyRatchet> keyRatchet) {
         return _encryptor->SetKeyRatchet(std::move(keyRatchet));
     }
 
@@ -230,7 +225,7 @@ NB_MODULE(_dave_impl, m) {
     m.def("get_max_supported_protocol_version", dave::MaxSupportedProtocolVersion);
 
     nb::class_<::mlspp::SignaturePrivateKey>(m, "SignaturePrivateKey");
-    nb::class_<dave::MlsKeyRatchet>(m, "MlsKeyRatchet");
+    nb::class_<dave::IKeyRatchet>(m, "IKeyRatchet");
 
     nb::class_<dave::EncryptorStats>(m, "EncryptorStats")
         .def_ro("passthrough_count", &dave::EncryptorStats::passthroughCount)
@@ -267,7 +262,7 @@ NB_MODULE(_dave_impl, m) {
         .def("get_key_ratchet",
             &SessionWrapper::GetKeyRatchet, nb::arg("user_id"),
             // explicit signature as this can return a nullptr
-            nb::sig("def get_key_ratchet(self, user_id: str) -> MlsKeyRatchet | None"))
+            nb::sig("def get_key_ratchet(self, user_id: str) -> IKeyRatchet | None"))
         .def("get_pairwise_fingerprint",
             &SessionWrapper::GetPairwiseFingerprint, nb::arg("version"), nb::arg("user_id"),
             nb::sig("def get_pairwise_fingerprint(self, version: int, user_id: str) -> asyncio.Future[bytes]"));
