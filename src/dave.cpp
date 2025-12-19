@@ -23,6 +23,7 @@
 #include "utils.hpp"
 
 namespace nb = nanobind;
+namespace dave = discord::dave;
 
 // used instead of std::variant for hard-/soft-rejecting messages
 enum RejectType : uint8_t {
@@ -31,28 +32,28 @@ enum RejectType : uint8_t {
 };
 
 template <class T>
-std::variant<RejectType, T> unwrapRejection(std::variant<discord::dave::failed_t, discord::dave::ignored_t, T>&& variant) {
-    if (std::holds_alternative<discord::dave::failed_t>(variant))
+std::variant<RejectType, T> unwrapRejection(std::variant<dave::failed_t, dave::ignored_t, T>&& variant) {
+    if (std::holds_alternative<dave::failed_t>(variant))
         return RejectType::Failed;
-    else if (std::holds_alternative<discord::dave::ignored_t>(variant))
+    else if (std::holds_alternative<dave::ignored_t>(variant))
         return RejectType::Ignored;
     return std::get<T>(std::move(variant));
 }
 
 class SessionWrapper {
 private:
-    std::unique_ptr<discord::dave::mls::Session> _session;
+    std::unique_ptr<dave::mls::Session> _session;
 public:
     SessionWrapper(
-        discord::dave::mls::KeyPairContextType context,
+        dave::mls::KeyPairContextType context,
         std::string authSessionId,
-        discord::dave::mls::MLSFailureCallback callback)
+        dave::mls::MLSFailureCallback callback)
     {
-        _session = std::make_unique<discord::dave::mls::Session>(context, authSessionId, callback);
+        _session = std::make_unique<dave::mls::Session>(context, authSessionId, callback);
     }
 
     void Init(
-        discord::dave::ProtocolVersion version,
+        dave::ProtocolVersion version,
         uint64_t groupId,
         std::string const& selfUserId,
         std::shared_ptr<::mlspp::SignaturePrivateKey>& transientKey)
@@ -62,9 +63,9 @@ public:
 
     void Reset() { _session->Reset(); }
 
-    void SetProtocolVersion(discord::dave::ProtocolVersion version) { _session->SetProtocolVersion(version); }
+    void SetProtocolVersion(dave::ProtocolVersion version) { _session->SetProtocolVersion(version); }
 
-    discord::dave::ProtocolVersion GetProtocolVersion() { return _session->GetProtocolVersion(); }
+    dave::ProtocolVersion GetProtocolVersion() { return _session->GetProtocolVersion(); }
 
     void SetExternalSender(nb::bytes marshalledExternalSender) {
         return _session->SetExternalSender(nb::bytes_to_vector(marshalledExternalSender));
@@ -83,11 +84,11 @@ public:
         return std::nullopt;
     }
 
-    std::variant<RejectType, discord::dave::RosterMap> ProcessCommit(nb::bytes commit) {
+    std::variant<RejectType, dave::RosterMap> ProcessCommit(nb::bytes commit) {
         return unwrapRejection(_session->ProcessCommit(nb::bytes_to_vector(commit)));
     }
 
-    std::optional<discord::dave::RosterMap> ProcessWelcome(
+    std::optional<dave::RosterMap> ProcessWelcome(
         nb::bytes welcome,
         std::set<std::string> const& recognizedUserIDs
     ) {
@@ -105,12 +106,12 @@ public:
         return nb::vector_to_bytes(_session->GetLastEpochAuthenticator());
     }
 
-    std::unique_ptr<discord::dave::MlsKeyRatchet> GetKeyRatchet(std::string const& userId) const noexcept {
+    std::unique_ptr<dave::MlsKeyRatchet> GetKeyRatchet(std::string const& userId) const noexcept {
         auto ratchet = _session->GetKeyRatchet(userId);
         // XXX: since we expose MlsKeyRatchet as an opaque type anyway, could we actually just return the opaque IKeyRatchet?
         // required to cast unique_ptr<IKeyRatchet> to unique_ptr<MlsKeyRatchet>
-        return std::unique_ptr<discord::dave::MlsKeyRatchet>(
-            static_cast<discord::dave::MlsKeyRatchet*>(ratchet.release())
+        return std::unique_ptr<dave::MlsKeyRatchet>(
+            static_cast<dave::MlsKeyRatchet*>(ratchet.release())
         );
     }
 
@@ -136,13 +137,13 @@ public:
 
 class EncryptorWrapper {
 private:
-    std::unique_ptr<discord::dave::Encryptor> _encryptor;
+    std::unique_ptr<dave::Encryptor> _encryptor;
 public:
     EncryptorWrapper() {
-        _encryptor = std::make_unique<discord::dave::Encryptor>();
+        _encryptor = std::make_unique<dave::Encryptor>();
     }
 
-    void SetKeyRatchet(std::unique_ptr<discord::dave::MlsKeyRatchet> keyRatchet) {
+    void SetKeyRatchet(std::unique_ptr<dave::MlsKeyRatchet> keyRatchet) {
         return _encryptor->SetKeyRatchet(std::move(keyRatchet));
     }
 
@@ -152,25 +153,25 @@ public:
 
     bool IsPassthroughMode() { return _encryptor->IsPassthroughMode(); }
 
-    void AssignSsrcToCodec(uint32_t ssrc, discord::dave::Codec codecType) {
+    void AssignSsrcToCodec(uint32_t ssrc, dave::Codec codecType) {
         _encryptor->AssignSsrcToCodec(ssrc, codecType);
     }
 
-    discord::dave::Codec CodecForSsrc(uint32_t ssrc) { return _encryptor->CodecForSsrc(ssrc); }
+    dave::Codec CodecForSsrc(uint32_t ssrc) { return _encryptor->CodecForSsrc(ssrc); }
 
     std::optional<nb::bytes> Encrypt(
-        discord::dave::MediaType mediaType,
+        dave::MediaType mediaType,
         uint32_t ssrc,
         nb::bytes frame
     ) {
-        auto frameView = discord::dave::MakeArrayView(
+        auto frameView = dave::MakeArrayView(
             reinterpret_cast<const uint8_t*>(frame.data()),
             frame.size()
         );
 
         auto requiredSize = _encryptor->GetMaxCiphertextByteSize(mediaType, frameView.size());
         std::vector<uint8_t> outFrame(requiredSize);
-        auto outFrameView = discord::dave::MakeArrayView(outFrame);
+        auto outFrameView = dave::MakeArrayView(outFrame);
 
         size_t bytesWritten = 0;
         auto result = _encryptor->Encrypt(
@@ -189,15 +190,15 @@ public:
         return nb::bytes(outFrame.data(), bytesWritten);
     }
 
-    discord::dave::EncryptorStats GetStats(discord::dave::MediaType mediaType) {
+    dave::EncryptorStats GetStats(dave::MediaType mediaType) {
         return _encryptor->GetStats(mediaType);
     }
 
-    void SetProtocolVersionChangedCallback(discord::dave::Encryptor::ProtocolVersionChangedCallback callback) {
+    void SetProtocolVersionChangedCallback(dave::Encryptor::ProtocolVersionChangedCallback callback) {
         _encryptor->SetProtocolVersionChangedCallback(callback);
     }
 
-    discord::dave::ProtocolVersion GetProtocolVersion() { return _encryptor->GetProtocolVersion(); }
+    dave::ProtocolVersion GetProtocolVersion() { return _encryptor->GetProtocolVersion(); }
 };
 
 NB_MODULE(_dave_impl, m) {
@@ -205,43 +206,43 @@ NB_MODULE(_dave_impl, m) {
 
     m.doc() = "Python bindings to the C++ impl of Discord's DAVE protocol";
 
-    m.attr("k_init_transition_id") = discord::dave::kInitTransitionId;
-    m.attr("k_disabled_version") = discord::dave::kDisabledVersion;
+    m.attr("k_init_transition_id") = dave::kInitTransitionId;
+    m.attr("k_disabled_version") = dave::kDisabledVersion;
 
     nb::enum_<RejectType>(m, "RejectType", nb::is_arithmetic(), "")
         .value("failed", RejectType::Failed, "")
         .value("ignored", RejectType::Ignored, "");
 
-    nb::enum_<discord::dave::MediaType>(m, "MediaType", nb::is_arithmetic(), "")
-        .value("audio", discord::dave::MediaType::Audio, "")
-        .value("video", discord::dave::MediaType::Video, "");
+    nb::enum_<dave::MediaType>(m, "MediaType", nb::is_arithmetic(), "")
+        .value("audio", dave::MediaType::Audio, "")
+        .value("video", dave::MediaType::Video, "");
 
 
-    nb::enum_<discord::dave::Codec>(m, "Codec", nb::is_arithmetic(), "")
-        .value("unknown", discord::dave::Codec::Unknown, "")
-        .value("opus", discord::dave::Codec::Opus, "")
-        .value("vp8", discord::dave::Codec::VP8, "")
-        .value("vp9", discord::dave::Codec::VP9, "")
-        .value("h264", discord::dave::Codec::H264, "")
-        .value("h265", discord::dave::Codec::H265, "")
-        .value("av1", discord::dave::Codec::AV1, "");
+    nb::enum_<dave::Codec>(m, "Codec", nb::is_arithmetic(), "")
+        .value("unknown", dave::Codec::Unknown, "")
+        .value("opus", dave::Codec::Opus, "")
+        .value("vp8", dave::Codec::VP8, "")
+        .value("vp9", dave::Codec::VP9, "")
+        .value("h264", dave::Codec::H264, "")
+        .value("h265", dave::Codec::H265, "")
+        .value("av1", dave::Codec::AV1, "");
 
-    m.def("get_max_supported_protocol_version", discord::dave::MaxSupportedProtocolVersion);
+    m.def("get_max_supported_protocol_version", dave::MaxSupportedProtocolVersion);
 
     nb::class_<::mlspp::SignaturePrivateKey>(m, "SignaturePrivateKey");
-    nb::class_<discord::dave::MlsKeyRatchet>(m, "MlsKeyRatchet");
+    nb::class_<dave::MlsKeyRatchet>(m, "MlsKeyRatchet");
 
-    nb::class_<discord::dave::EncryptorStats>(m, "EncryptorStats")
-        .def_ro("passthrough_count", &discord::dave::EncryptorStats::passthroughCount)
-        .def_ro("encrypt_success_count", &discord::dave::EncryptorStats::encryptSuccessCount)
-        .def_ro("encrypt_failure_count", &discord::dave::EncryptorStats::encryptFailureCount)
-        .def_ro("encrypt_duration", &discord::dave::EncryptorStats::encryptDuration)
-        .def_ro("encrypt_attempts", &discord::dave::EncryptorStats::encryptAttempts)
-        .def_ro("encrypt_max_attempts", &discord::dave::EncryptorStats::encryptMaxAttempts)
-        .def_ro("encrypt_missing_key_count", &discord::dave::EncryptorStats::encryptMissingKeyCount);
+    nb::class_<dave::EncryptorStats>(m, "EncryptorStats")
+        .def_ro("passthrough_count", &dave::EncryptorStats::passthroughCount)
+        .def_ro("encrypt_success_count", &dave::EncryptorStats::encryptSuccessCount)
+        .def_ro("encrypt_failure_count", &dave::EncryptorStats::encryptFailureCount)
+        .def_ro("encrypt_duration", &dave::EncryptorStats::encryptDuration)
+        .def_ro("encrypt_attempts", &dave::EncryptorStats::encryptAttempts)
+        .def_ro("encrypt_max_attempts", &dave::EncryptorStats::encryptMaxAttempts)
+        .def_ro("encrypt_missing_key_count", &dave::EncryptorStats::encryptMissingKeyCount);
 
     nb::class_<SessionWrapper>(m, "Session")
-        .def(nb::init<discord::dave::mls::KeyPairContextType, std::string, discord::dave::mls::MLSFailureCallback>(),
+        .def(nb::init<dave::mls::KeyPairContextType, std::string, dave::mls::MLSFailureCallback>(),
             nb::arg("context"), nb::arg("auth_session_id"), nb::arg("mls_failure_callback"))
         .def("init",
             &SessionWrapper::Init, nb::arg("version"), nb::arg("group_id"), nb::arg("self_user_id"), nb::arg("transient_key").none())
@@ -265,7 +266,6 @@ NB_MODULE(_dave_impl, m) {
             &SessionWrapper::GetMarshalledKeyPackage)
         .def("get_key_ratchet",
             &SessionWrapper::GetKeyRatchet, nb::arg("user_id"),
-            // TODO: fix by using optional?
             // explicit signature as this can return a nullptr
             nb::sig("def get_key_ratchet(self, user_id: str) -> MlsKeyRatchet | None"))
         .def("get_pairwise_fingerprint",
