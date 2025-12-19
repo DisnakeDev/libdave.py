@@ -124,7 +124,11 @@ before-all = []
 # - perl-IPC-Cmd + perl-FindBin are needed to build openssl in RHEL
 [[tool.cibuildwheel.overrides]]
 select = ["*-manylinux_*"]
-before-all = ["dnf install -y git curl zip unzip pkgconfig nasm golang perl-IPC-Cmd perl-FindBin ninja-build"]
+before-all = [
+  "dnf install -y git curl zip unzip pkgconfig nasm golang perl-IPC-Cmd ninja-build",
+  # needed on newer perl streams (currently, only in manylinux_2_39 used by riscv64 image)
+  "sh -c 'dnf install -y perl-FindBin || true'",
+]
 
 [[tool.cibuildwheel.overrides]]
 select = ["*-manylinux_armv7l"]
