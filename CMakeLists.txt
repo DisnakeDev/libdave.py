@@ -60,22 +60,20 @@ add_subdirectory(nanobind)
 
 nanobind_add_module(_dave_impl STABLE_ABI src/dave.cpp)
 
-# TODO: add a separate target for this?
-# FIXME: this should actually run in CI. we'll have to work out how to make it not fail when cross-compiling
-if (NOT DEFINED ENV{CI})
-    nanobind_add_stub(
-        dave_stub
-        MODULE _dave_impl
-        OUTPUT _dave_impl.pyi
-        PYTHON_PATH $<TARGET_FILE_DIR:_dave_impl>
-        DEPENDS _dave_impl
-    )
-    add_custom_command(
-        TARGET dave_stub
-        POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_BINARY_DIR}/_dave_impl.pyi ${CMAKE_CURRENT_SOURCE_DIR}/src/dave/
-    )
-endif()
-
 add_subdirectory(${LIBDAVE_SRC_PATH})
 target_link_libraries(_dave_impl PRIVATE libdave)
+
+# Generate typing stub, additionally storing it in src directory for type hints during development.
+# If we ever add other dependencies, this will have to be gated by if(SKBUILD)
+set(STUB_OUTPUT_PATH "${CMAKE_SOURCE_DIR}/src/dave/_dave_impl.pyi")
+nanobind_add_stub(
+    dave_stub
+    MODULE _dave_impl
+    OUTPUT ${STUB_OUTPUT_PATH}
+    PYTHON_PATH $<TARGET_FILE_DIR:_dave_impl>
+    DEPENDS _dave_impl
+)
+
+# install library and stub file in wheel
 install(TARGETS _dave_impl LIBRARY DESTINATION dave)
+install(FILES ${STUB_OUTPUT_PATH} DESTINATION dave)
