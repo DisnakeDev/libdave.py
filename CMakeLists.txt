@@ -1,31 +1,4 @@
 cmake_minimum_required(VERSION 3.18)
-set(CMAKE_POSITION_INDEPENDENT_CODE ON)
-
-set(LIBDAVE_SRC_PATH ${CMAKE_CURRENT_SOURCE_DIR}/libdave/cpp)
-
-# this is probably not the proper way to do this
-set(CMAKE_TOOLCHAIN_FILE ${LIBDAVE_SRC_PATH}/vcpkg/scripts/buildsystems/vcpkg.cmake CACHE STRING "")
-set(VCPKG_MANIFEST_DIR ${LIBDAVE_SRC_PATH}/vcpkg-alts/openssl_3 CACHE STRING "")
-
-if (WIN32)
-    if (CMAKE_GENERATOR_PLATFORM STREQUAL "x64")
-        set(VCPKG_TARGET_TRIPLET "x64-windows-static-md")
-    elseif (CMAKE_GENERATOR_PLATFORM STREQUAL "ARM64")
-        set(VCPKG_TARGET_TRIPLET "arm64-windows-static-md")
-    else()
-        message(FATAL_ERROR "unexpected platform: ${CMAKE_GENERATOR_PLATFORM}")
-    endif()
-endif()
-
-cmake_host_system_information(RESULT PLATFORM QUERY OS_PLATFORM)
-if (PLATFORM STREQUAL "armv8l")
-    # vcpkg doesn't seem to understand armv8l (i.e. aarch64 running in 32-bit mode),
-    # it only knows aarch64 and armv7l, so we must explicitly tell it what we're building
-    set(VCPKG_TARGET_TRIPLET "arm-linux")
-endif()
-
-
-project(dave LANGUAGES CXX)
 
 # Warn if the user invokes CMake directly
 if (NOT SKBUILD)
@@ -50,6 +23,34 @@ if (NOT SKBUILD)
   the package is imported. Otherwise, you need to rerun the above
   after editing C++ files.")
 endif()
+
+set(LIBDAVE_SRC_PATH ${CMAKE_CURRENT_SOURCE_DIR}/libdave/cpp)
+
+# this is probably not the proper way to do this
+set(CMAKE_TOOLCHAIN_FILE ${LIBDAVE_SRC_PATH}/vcpkg/scripts/buildsystems/vcpkg.cmake CACHE STRING "")
+set(VCPKG_MANIFEST_DIR ${LIBDAVE_SRC_PATH}/vcpkg-alts/openssl_3 CACHE STRING "")
+
+if (WIN32)
+    if (CMAKE_GENERATOR_PLATFORM STREQUAL "x64")
+        set(VCPKG_TARGET_TRIPLET "x64-windows-static-md")
+    elseif (CMAKE_GENERATOR_PLATFORM STREQUAL "ARM64")
+        set(VCPKG_TARGET_TRIPLET "arm64-windows-static-md")
+    else()
+        message(FATAL_ERROR "unexpected platform: ${CMAKE_GENERATOR_PLATFORM}")
+    endif()
+endif()
+
+cmake_host_system_information(RESULT PLATFORM QUERY OS_PLATFORM)
+if (PLATFORM STREQUAL "armv8l")
+    # vcpkg doesn't seem to understand armv8l (i.e. aarch64 running in 32-bit mode),
+    # it only knows aarch64 and armv7l, so we must explicitly tell it what we're building
+    set(VCPKG_TARGET_TRIPLET "arm-linux")
+endif()
+
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+
+
+project(dave LANGUAGES CXX)
 
 find_package(
     Python
