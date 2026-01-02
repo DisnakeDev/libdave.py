@@ -53,7 +53,6 @@ include = [
 [tool.ruff]
 line-length = 100
 extend-exclude = [
-  "src/dave/_dave_impl.pyi",
   "libdave/",
   "nanobind/",
 ]
