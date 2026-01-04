@@ -56,7 +56,14 @@ execute_process(
   OUTPUT_STRIP_TRAILING_WHITESPACE OUTPUT_VARIABLE nanobind_ROOT)
 find_package(nanobind CONFIG REQUIRED)
 
-nanobind_add_module(_dave_impl STABLE_ABI src/dave.cpp)
+nanobind_add_module(
+    _dave_impl STABLE_ABI
+    src/dave.cpp
+    src/decryptor.cpp
+    src/encryptor.cpp
+    src/session.cpp
+    src/signature_key_pair.cpp
+)
 
 add_subdirectory(${LIBDAVE_SRC_PATH})
 target_link_libraries(_dave_impl PRIVATE libdave)
