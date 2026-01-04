@@ -2,18 +2,20 @@
 
 #include <vector>
 
-NAMESPACE_BEGIN(NB_NAMESPACE)
+namespace nb = nanobind;
 
-inline nanobind::bytes vector_to_bytes(const std::vector<uint8_t>& vec) {
-    return nanobind::bytes(vec.data(), vec.size());
+namespace nanobind {
+
+inline nb::bytes vector_to_bytes(const std::vector<uint8_t>& vec) {
+    return nb::bytes(vec.data(), vec.size());
 }
 
-inline std::vector<uint8_t> bytes_to_vector(nanobind::bytes bytes) {
+inline std::vector<uint8_t> bytes_to_vector(nb::bytes bytes) {
     const auto* ptr = static_cast<const uint8_t*>(bytes.data());
     return {ptr, ptr + bytes.size()};
 }
 
-NAMESPACE_END(NB_NAMESPACE)
+}  // namespace nanobind
 
 // Wrapper object to safely capture refcounted objects in lambdas while the GIL is not necessarily
 // being held. Basically, the only point of this is to ensure the GIL is held in the destructor.
