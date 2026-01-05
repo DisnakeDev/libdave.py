@@ -114,7 +114,7 @@ jobs:
       - uses: pypa/cibuildwheel@v3.2
         env:
           # choose manylinux/musllinux (they are split for the sake of ci speedup)
-          CIBW_SKIP: ${{ matrix.libc == 'glibc' && '*musllinux*' || '*manylinux*'}}
+          CIBW_BUILD: ${{ matrix.libc == 'glibc' && '*manylinux*' || (matrix.libc == 'musl' && '*musllinux*' || '') }}
           CIBW_ARCHS: ${{ matrix.arch }}
 
       - name: Verify clean directory

@@ -118,13 +118,13 @@ cmake.define = { BUILD_SHARED_LIBS = "OFF" }
 
 
 [tool.cibuildwheel]
-# can't set `skip` here, since it's used in the gh workflow and would be overridden
-build = [
-  "cp*-win_amd64",
-  "cp*-win_arm64",
-  "cp*-macosx_*",
-  "cp*-manylinux_*",
-  "cp*-musllinux_*",
+skip = [
+  # pypy
+  "pp*",
+  # 32bit windows
+  "*-win32",
+  # free-threaded python versions
+  "cp*t-*",
 ]
 build-verbosity = 1
 environment-pass = ["CI", "VCPKG_BINARY_SOURCES", "COPY_VCPKG_BINARY_PATH"]
@@ -173,14 +173,6 @@ before-all = ["./scripts/setup-vcpkg.sh"]
 [[tool.cibuildwheel.overrides]]
 select = "*linux_{aarch64,armv7l,ppc64le,s390x,riscv64}"
 environment = { VCPKG_FORCE_SYSTEM_BINARIES = "1" }
-
-# While this doesn't actually support free-threading just yet, we build wheels for it nonetheless,
-# even if it results in the GIL being re-enabled on import, just so they're available.
-# This results in a RuntimeWarning, which makes tests fail, so explicitly disable the
-# GIL for tests to avoid the warning.
-[[tool.cibuildwheel.overrides]]
-select = "cp*t-"
-test-environment = { PYTHON_GIL = "0" }
 
 
 # Needed for full C++17 support on macOS
