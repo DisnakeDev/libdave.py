@@ -14,7 +14,7 @@ fi
 #   however the patch didn't quite work up until vcpkg-tool 2025-10-10, while our/libdave's vcpkg submodule still uses 2025-06-02.
 #   Until the submodule is updated, this env variable is needed.
 #   See also https://github.com/apache/arrow/pull/47616#issuecomment-3387347510.
-env CMAKE_POLICY_VERSION_MINIMUM=3.5 ./libdave/cpp/vcpkg/bootstrap-vcpkg.sh
+env CMAKE_POLICY_VERSION_MINIMUM=3.5 ./libdave/cpp/vcpkg/bootstrap-vcpkg.sh -disableMetrics
 
 # copy binary to host for caching, this is only relevant in CI
 if [ -n "$COPY_VCPKG_BINARY_PATH" ]; then

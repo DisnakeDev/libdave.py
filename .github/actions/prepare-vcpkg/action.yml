@@ -48,9 +48,9 @@ runs:
       shell: bash
       run: |
         if [ "${{ runner.os }}" = "Windows" ]; then
-          libdave/cpp/vcpkg/bootstrap-vcpkg.bat
+          libdave/cpp/vcpkg/bootstrap-vcpkg.bat -disableMetrics
         elif [ "${{ runner.os }}" = "macOS" ]; then
-          ./libdave/cpp/vcpkg/bootstrap-vcpkg.sh
+          ./libdave/cpp/vcpkg/bootstrap-vcpkg.sh -disableMetrics
         fi
         # linux will bootstrap later, since it runs in a separate container instead of directly on the host
 
