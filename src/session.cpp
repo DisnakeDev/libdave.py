@@ -34,7 +34,7 @@ void bindSession(nb::module_& m) {
                 // would never return anything anyway)
                 new (self) dave::mls::Session("", "", callback);
             },
-            nb::arg("mls_failure_callback").none()
+            nb::arg("mls_failure_callback").none() = nullptr
         )
         .def(
             "init",
@@ -42,7 +42,7 @@ void bindSession(nb::module_& m) {
             nb::arg("version"),
             nb::arg("group_id"),
             nb::arg("self_user_id"),
-            nb::arg("transient_key").none()
+            nb::arg("transient_key").none() = nullptr
         )
         .def("reset", &dave::mls::Session::Reset)
         .def("set_protocol_version", &dave::mls::Session::SetProtocolVersion, nb::arg("version"))
