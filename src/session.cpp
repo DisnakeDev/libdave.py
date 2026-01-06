@@ -20,12 +20,22 @@ std::variant<RejectType, T> unwrapRejection(
     return std::get<T>(std::move(variant));
 }
 
+std::vector<nb::handle> session_refs(dave::mls::Session* self) {
+    return {nb::find(self->GetMLSFailureCallback())};
+}
+GC_TRAVERSE(session_tp_traverse, dave::mls::Session, session_refs)
+
+PyType_Slot session_slots[] = {
+    {Py_tp_traverse, (void*)session_tp_traverse},
+    {0, 0},
+};
+
 void bindSession(nb::module_& m) {
     nb::enum_<RejectType>(m, "RejectType", nb::is_arithmetic(), "")
         .value("failed", RejectType::Failed, "")
         .value("ignored", RejectType::Ignored, "");
 
-    nb::class_<dave::mls::Session>(m, "Session")
+    nb::class_<dave::mls::Session>(m, "Session", nb::type_slots(session_slots))
         .def(
             "__init__",
             [](dave::mls::Session* self, dave::mls::MLSFailureCallback callback) {

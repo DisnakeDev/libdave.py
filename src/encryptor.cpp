@@ -3,6 +3,16 @@
 
 #include "binding_core.hpp"
 
+std::vector<nb::handle> encryptor_refs(dave::Encryptor* self) {
+    return {nb::find(self->GetProtocolVersionChangedCallback())};
+}
+GC_TRAVERSE(encryptor_tp_traverse, dave::Encryptor, encryptor_refs)
+
+PyType_Slot encryptor_slots[] = {
+    {Py_tp_traverse, (void*)encryptor_tp_traverse},
+    {0, 0},
+};
+
 void bindEncryptor(nb::module_& m) {
     nb::class_<dave::EncryptorStats>(m, "EncryptorStats")
         .def_ro("passthrough_count", &dave::EncryptorStats::passthroughCount)
@@ -13,7 +23,7 @@ void bindEncryptor(nb::module_& m) {
         .def_ro("encrypt_max_attempts", &dave::EncryptorStats::encryptMaxAttempts)
         .def_ro("encrypt_missing_key_count", &dave::EncryptorStats::encryptMissingKeyCount);
 
-    nb::class_<dave::Encryptor>(m, "Encryptor")
+    nb::class_<dave::Encryptor>(m, "Encryptor", nb::type_slots(encryptor_slots))
         .def(nb::init<>())
         .def("set_key_ratchet", &dave::Encryptor::SetKeyRatchet, nb::arg("key_ratchet").none())
         .def(
