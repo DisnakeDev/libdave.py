@@ -47,8 +47,7 @@ jobs:
           # }
           single = ["windows-latest"]
           ubuntu_archs = {"ubuntu-latest": ["native"]}
-          # this will be the only one for now, but left configurable nonetheless
-          # TODO: actually use this for VCPKG_MANIFEST_DIR
+          # this will be the only one for now
           crypto = ["openssl_3"]
 
           matrix = []
@@ -109,8 +108,6 @@ jobs:
         with:
           platforms: all
 
-      # TODO: CMAKE_BUILD_PARALLEL_LEVEL ?
-      # TODO: REQUIRE_BORINGSSL to enforce boringssl if requested?
       - uses: pypa/cibuildwheel@v3.2
         env:
           # choose manylinux/musllinux (they are split for the sake of ci speedup)

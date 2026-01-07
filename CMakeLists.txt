@@ -1,4 +1,5 @@
 cmake_minimum_required(VERSION 3.18)
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 # Warn if the user invokes CMake directly
 if (NOT SKBUILD)
@@ -16,12 +17,21 @@ if (NOT SKBUILD)
   developer-friendly build environment.")
 endif()
 
+
+# (somewhat) configurable
+set(
+    LIBDAVE_CRYPTO "openssl_3"
+    CACHE STRING "which crypto library to use, one of 'openssl_3', 'openssl_1.1', 'boringssl'"
+)
+
+# General build environment/toolchain setup
 set(LIBDAVE_SRC_PATH ${CMAKE_CURRENT_SOURCE_DIR}/libdave/cpp)
 
-# this is probably not the proper way to do this
-set(CMAKE_TOOLCHAIN_FILE ${LIBDAVE_SRC_PATH}/vcpkg/scripts/buildsystems/vcpkg.cmake CACHE STRING "")
-set(VCPKG_MANIFEST_DIR ${LIBDAVE_SRC_PATH}/vcpkg-alts/openssl_3 CACHE STRING "")
+set(CMAKE_TOOLCHAIN_FILE "${LIBDAVE_SRC_PATH}/vcpkg/scripts/buildsystems/vcpkg.cmake" CACHE STRING "")
+set(VCPKG_MANIFEST_DIR "${LIBDAVE_SRC_PATH}/vcpkg-alts/${LIBDAVE_CRYPTO}" CACHE STRING "")
 
+
+# Architecture-specific ~~hacks~~ target specification
 if (WIN32)
     if (CMAKE_GENERATOR_PLATFORM STREQUAL "x64")
         set(VCPKG_TARGET_TRIPLET "x64-windows-static-md")
@@ -39,14 +49,13 @@ if (PLATFORM STREQUAL "armv8l")
     set(VCPKG_TARGET_TRIPLET "arm-linux")
 endif()
 
-set(CMAKE_POSITION_INDEPENDENT_CODE ON)
-
 
 project(dave LANGUAGES CXX)
 
+
+# Set up python/nanobind (see also https://nanobind.readthedocs.io/en/latest/building.html)
 find_package(Python REQUIRED COMPONENTS Interpreter Development.Module)
 
-# Find (and load) nanobind, see https://nanobind.readthedocs.io/en/latest/building.html#finding-nanobind
 execute_process(
   COMMAND "${Python_EXECUTABLE}" -m nanobind --cmake_dir
   OUTPUT_STRIP_TRAILING_WHITESPACE OUTPUT_VARIABLE nanobind_ROOT)
@@ -61,9 +70,6 @@ nanobind_add_module(
     src/signature_key_pair.cpp
 )
 
-add_subdirectory(${LIBDAVE_SRC_PATH})
-target_link_libraries(_dave_impl PRIVATE libdave)
-
 # Generate typing stub, additionally storing it in src directory for type hints during development.
 # If we ever add other dependencies, this will have to be gated by if(SKBUILD)
 set(STUB_OUTPUT_PATH "${CMAKE_SOURCE_DIR}/src/dave/_dave_impl.pyi")
@@ -75,6 +81,11 @@ nanobind_add_stub(
     DEPENDS _dave_impl
 )
 
-# install library and stub file in wheel
+
+# Link libdave
+add_subdirectory(${LIBDAVE_SRC_PATH})
+target_link_libraries(_dave_impl PRIVATE libdave)
+
+# Install library and stub file in wheel
 install(TARGETS _dave_impl LIBRARY DESTINATION dave)
 install(FILES ${STUB_OUTPUT_PATH} DESTINATION dave)
