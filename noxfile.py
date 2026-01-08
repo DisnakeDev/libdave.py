@@ -1,6 +1,6 @@
 #!/usr/bin/env -S uv run --script
 # /// script
-# requires-python = ">=3.8"
+# requires-python = ">=3.9"
 # dependencies = [
 #     "nox==2025.5.1",
 # ]
@@ -10,7 +10,8 @@
 
 from __future__ import annotations
 
-from typing import Any, Dict, List, Sequence
+from collections.abc import Sequence
+from typing import Any
 
 import nox
 
@@ -35,13 +36,13 @@ def install_deps(
         msg = "Cannot install extras without also installing the project"
         raise TypeError(msg)
 
-    command: List[str] = [
+    command: list[str] = [
         "uv",
         "sync",
         "--no-default-groups",
     ]
 
-    env: Dict[str, Any] = {}
+    env: dict[str, Any] = {}
     if session.venv_backend != "none":
         command.append(f"--python={session.virtualenv.location}")
         env["UV_PROJECT_ENVIRONMENT"] = str(session.virtualenv.location)

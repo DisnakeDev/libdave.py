@@ -5,7 +5,7 @@ name = "libdave.py"
 version = "0.1.0a"
 description = "Python bindings for the libdave package."
 readme = "README.md"
-requires-python = ">=3.8"
+requires-python = ">=3.9"
 license = { text = "MIT" }
 authors = [{ name = "Disnake Development" }]
 
@@ -78,6 +78,7 @@ ignore = [
   #
   "ERA",
   "PLR2004",
+  "TC001", "TC002", "TC003"
 ]
 
 
