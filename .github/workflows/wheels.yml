@@ -67,7 +67,7 @@ jobs:
 
           # add display names, these are just for displaying on GitHub
           for m in matrix:
-              m["display_name"] = ", ".join(filter(None, [
+              m["display-name"] = ", ".join(filter(None, [
                   m["os"], m.get("arch"), m.get("libc")
               ]))
 
@@ -77,13 +77,13 @@ jobs:
           )" >> $GITHUB_OUTPUT
 
   build_wheels:
-    name: Wheels (${{ matrix.display_name }})
+    name: Wheels (${{ matrix.display-name }})
     runs-on: ${{ matrix.os }}
     needs: generate_matrix
     strategy:
       fail-fast: false
       matrix:
-        # entries are {os: *, arch: *, libc: *, crypto: *}
+        # entries are {os: *, arch: *, libc: *, crypto: *, display-name: *}
         include: ${{ fromJSON(needs.generate_matrix.outputs.matrix) }}
 
     steps:
@@ -121,7 +121,7 @@ jobs:
         uses: actions/upload-artifact@v5
         with:
           path: wheelhouse/*.whl
-          name: dist-${{ matrix.os }}-${{ matrix.arch }}-${{ matrix.libc }}
+          name: dist-${{ matrix.display-name }}
 
   upload_all:
     name: Upload if release
