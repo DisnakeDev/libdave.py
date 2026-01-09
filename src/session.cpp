@@ -137,5 +137,6 @@ void bindSession(nb::module_& m) {
                 "def get_pairwise_fingerprint(self, version: int, user_id: str) -> "
                 "asyncio.Future[bytes]"
             )
-        );
+        )
+        .def("has_established_group", &dave::mls::Session::HasEstablishedGroupState);
 }
