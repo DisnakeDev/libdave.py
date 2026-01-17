@@ -70,6 +70,8 @@ jobs:
               m["display-name"] = ", ".join(filter(None, [
                   m["os"], m.get("arch"), m.get("libc")
               ]))
+              # why on earth does GHA not have a `replace()` function
+              m["artifact-tag"] = m["display-name"].replace(", ", "-")
 
           import json
           print(json.dumps(matrix))
@@ -83,7 +85,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # entries are {os: *, arch: *, libc: *, crypto: *, display-name: *}
+        # entries are {os: *, arch: *, libc: *, crypto: *, display-name: *, artifact-tag: *}
         include: ${{ fromJSON(needs.generate_matrix.outputs.matrix) }}
 
     steps:
@@ -121,7 +123,7 @@ jobs:
         uses: actions/upload-artifact@v5
         with:
           path: wheelhouse/*.whl
-          name: dist-${{ matrix.display-name }}
+          name: dist-${{ matrix.artifact-tag }}
 
   upload_all:
     name: Upload if release
