@@ -43,7 +43,7 @@ jobs:
           # single = ["macos-15-intel", "macos-latest", "windows-latest", "windows-11-arm"]
           # ubuntu_archs = {
           #     "ubuntu-latest": ["native", "ppc64le", "s390x", "riscv64"],
-          #     "ubuntu-24.04-arm": ["native", "armv7l"],
+          #     "ubuntu-24.04-arm": ["native"],
           # }
           single = ["windows-latest", "macos-latest"]
           ubuntu_archs = {"ubuntu-latest": ["native"]}
@@ -104,8 +104,7 @@ jobs:
           cache-dir: ${{ github.workspace }}/vcpkg_cache
 
       - name: Set up QEMU
-        # armv7l can run natively on arm64v8, no qemu needed
-        if: runner.os == 'Linux' && matrix.arch != 'native' && matrix.arch != 'armv7l'
+        if: runner.os == 'Linux' && matrix.arch != 'native'
         uses: docker/setup-qemu-action@v3
         with:
           platforms: all

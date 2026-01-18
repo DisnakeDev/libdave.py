@@ -125,8 +125,10 @@ cmake.build-type = "Debug"
 
 [tool.cibuildwheel]
 skip = [
-  # 32bit windows
+  # 32-bit windows
   "*-win32",
+  # 32-bit linux
+  "*_armv7l",
   # free-threaded python versions
   "cp*t-*",
 ]
@@ -156,13 +158,6 @@ before-all = [
 ]
 
 [[tool.cibuildwheel.overrides]]
-select = ["*-manylinux_armv7l"]
-before-all = [
-  "apt-get update",
-  "apt-get install -y git curl zip unzip pkg-config nasm golang ninja-build"
-]
-
-[[tool.cibuildwheel.overrides]]
 select = ["*-musllinux_*"]
 before-all = ["apk add git curl zip unzip pkgconfig nasm go ninja-build ninja-is-really-ninja"]
 
@@ -175,7 +170,7 @@ before-all = ["./scripts/setup-vcpkg.sh"]
 
 # required to build vcpkg on other platforms
 [[tool.cibuildwheel.overrides]]
-select = "*linux_{aarch64,armv7l,ppc64le,s390x,riscv64}"
+select = "*linux_{aarch64,ppc64le,s390x,riscv64}"
 environment = { VCPKG_FORCE_SYSTEM_BINARIES = "1" }
 
 

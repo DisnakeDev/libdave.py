@@ -31,6 +31,8 @@ set(CMAKE_TOOLCHAIN_FILE "${LIBDAVE_SRC_PATH}/vcpkg/scripts/buildsystems/vcpkg.c
 set(VCPKG_MANIFEST_DIR "${LIBDAVE_SRC_PATH}/vcpkg-alts/${LIBDAVE_CRYPTO}" CACHE STRING "")
 
 
+# FIXME: raise FATAL_ERROR if building for 32 bit platform (including armv8l)
+
 # Architecture-specific ~~hacks~~ target specification
 if (WIN32)
     if (CMAKE_GENERATOR_PLATFORM STREQUAL "x64")
@@ -41,14 +43,6 @@ if (WIN32)
         message(FATAL_ERROR "unexpected platform: ${CMAKE_GENERATOR_PLATFORM}")
     endif()
 endif()
-
-cmake_host_system_information(RESULT PLATFORM QUERY OS_PLATFORM)
-if (PLATFORM STREQUAL "armv8l")
-    # vcpkg doesn't seem to understand armv8l (i.e. aarch64 running in 32-bit mode),
-    # it only knows aarch64 and armv7l, so we must explicitly tell it what we're building
-    set(VCPKG_TARGET_TRIPLET "arm-linux")
-endif()
-
 
 project(dave LANGUAGES CXX)
 
