@@ -13,6 +13,7 @@ jobs:
     steps:
       - uses: actions/checkout@v5
         with:
+          # NOTE: this should not be recursive, we really don't want to bundle vcpkg
           submodules: true
 
       - name: Build SDist
@@ -93,7 +94,6 @@ jobs:
         with:
           submodules: recursive
 
-      # TODO: this is somewhat expensive. maybe we can drop the vcpkg submodule somehow?
       - name: Unshallow vcpkg submodule
         run: git -C libdave/cpp/vcpkg fetch --unshallow
 

@@ -26,9 +26,24 @@ set(
 
 # General build environment/toolchain setup
 set(LIBDAVE_SRC_PATH ${CMAKE_CURRENT_SOURCE_DIR}/libdave/cpp)
-
-set(CMAKE_TOOLCHAIN_FILE "${LIBDAVE_SRC_PATH}/vcpkg/scripts/buildsystems/vcpkg.cmake" CACHE STRING "")
 set(VCPKG_MANIFEST_DIR "${LIBDAVE_SRC_PATH}/vcpkg-alts/${LIBDAVE_CRYPTO}" CACHE STRING "")
+
+set(_VCPKG_TOOLCHAIN "${LIBDAVE_SRC_PATH}/vcpkg/scripts/buildsystems/vcpkg.cmake")
+if (NOT EXISTS ${_VCPKG_TOOLCHAIN})
+    if (DEFINED ENV{VCPKG_ROOT})
+        set(_VCPKG_TOOLCHAIN "$ENV{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake")
+    else()
+        message(FATAL_ERROR "\
+        vcpkg toolchain not found.
+        If you're installing from PyPI, clone https://github.com/microsoft/vcpkg
+        and set the $VCPKG_ROOT environment variable to that location.
+        (If you are a developer contributing to this package, ensure that
+        all submodules are initialized instead).
+        ")
+    endif()
+endif()
+set(CMAKE_TOOLCHAIN_FILE ${_VCPKG_TOOLCHAIN} CACHE STRING "")
+message(STATUS "Using vcpkg toolchain ${CMAKE_TOOLCHAIN_FILE}")
 
 
 # Architecture-specific ~~hacks~~ target specification
