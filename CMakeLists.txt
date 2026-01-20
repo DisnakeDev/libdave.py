@@ -31,8 +31,6 @@ set(CMAKE_TOOLCHAIN_FILE "${LIBDAVE_SRC_PATH}/vcpkg/scripts/buildsystems/vcpkg.c
 set(VCPKG_MANIFEST_DIR "${LIBDAVE_SRC_PATH}/vcpkg-alts/${LIBDAVE_CRYPTO}" CACHE STRING "")
 
 
-# FIXME: raise FATAL_ERROR if building for 32 bit platform (including armv8l)
-
 # Architecture-specific ~~hacks~~ target specification
 if (WIN32)
     if (CMAKE_GENERATOR_PLATFORM STREQUAL "x64")
@@ -41,6 +39,19 @@ if (WIN32)
         set(VCPKG_TARGET_TRIPLET "arm64-windows-static-md")
     else()
         message(FATAL_ERROR "unexpected platform: ${CMAKE_GENERATOR_PLATFORM}")
+    endif()
+endif()
+
+# This is more of a best-effort thing and not entirely reliable.
+# CMAKE_SIZEOF_VOID_P is only set after project(), which doesn't provide
+# great DX considering you'd have to first wait several minutes for vcpkg deps
+# to install, only to find out 32-bit systems aren't supported.
+if ("${VCPKG_TARGET_TRIPLET}" STREQUAL "")
+    cmake_host_system_information(RESULT IS_64BIT QUERY IS_64BIT)
+    cmake_host_system_information(RESULT OS_PLATFORM QUERY OS_PLATFORM)
+    # (armv8l is aarch64 running in 32-bit mode)
+    if (NOT IS_64BIT OR OS_PLATFORM STREQUAL "armv8l")
+        message(FATAL_ERROR "32-bit platforms are not supported.")
     endif()
 endif()
 
