@@ -111,6 +111,7 @@ nanobind_add_stub(
 
 # Link libdave
 set(INSTALL_VCPKG_LICENSES ON)
+set(LICENSES_DIR "${SKBUILD_METADATA_DIR}/licenses")
 add_subdirectory(${LIBDAVE_SRC_PATH})
 
 target_include_directories(_dave_impl PRIVATE "${LIBDAVE_SRC_PATH}/src")
