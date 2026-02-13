@@ -5,8 +5,8 @@
 1. Clone the repository:
 
     ```sh
-    git clone --recurse-submodules https://github.com/DisnakeDev/libdave.py
-    cd libdave.py
+    git clone --recurse-submodules https://github.com/DisnakeDev/dave.py
+    cd dave.py
     ```
 
     If you already cloned, use the following command to get the submodules:
